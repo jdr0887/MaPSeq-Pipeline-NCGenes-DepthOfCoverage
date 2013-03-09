@@ -405,9 +405,9 @@
     </plugins>
   </build>
   <modules>
+    <module>ncgenes-depth-of-coverage-workflow</module>
     <module>ncgenes-depth-of-coverage-commands</module>
     <module>ncgenes-depth-of-coverage-features</module>
     <module>ncgenes-depth-of-coverage-messaging</module>
-    <module>ncgenes-depth-of-coverage-workflow</module>
   </modules>
 </project>
