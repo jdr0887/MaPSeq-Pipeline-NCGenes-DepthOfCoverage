@@ -45,4 +45,9 @@
 
   <service ref="NCGenesDOCPipelineBeanService" interface="edu.unc.mapseq.pipeline.PipelineBeanService" />
 
+  <bean id="NCGenesDOCPipelineExecutorService" class="edu.unc.mapseq.pipeline.ncgenes.doc.NCGenesDOCPipelineExecutorService"
+    init-method="start" destroy-method="stop" activation="eager">
+    <property name="pipelineBeanService" ref="NCGenesDOCPipelineBeanService" />
+  </bean>
+
 </blueprint>
