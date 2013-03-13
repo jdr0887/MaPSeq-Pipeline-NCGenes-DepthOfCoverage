@@ -1,6 +1,7 @@
 package edu.unc.mapseq.messaging.ncgenes.doc;
 
-import java.util.concurrent.Executors;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -8,11 +9,20 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.unc.mapseq.dao.MaPSeqDAOException;
+import edu.unc.mapseq.dao.model.Account;
+import edu.unc.mapseq.dao.model.HTSFSample;
+import edu.unc.mapseq.dao.model.SequencerRun;
+import edu.unc.mapseq.dao.model.WorkflowPlan;
+import edu.unc.mapseq.dao.model.WorkflowRun;
+import edu.unc.mapseq.dao.model.WorkflowRunStatusType;
+import edu.unc.mapseq.messaging.common.EntityUtil;
 import edu.unc.mapseq.pipeline.ncgenes.doc.NCGenesDOCPipelineBeanService;
 
 public class NCGenesDOCMessageListener implements MessageListener {
@@ -60,10 +70,89 @@ public class NCGenesDOCMessageListener implements MessageListener {
             logger.error("BAD JSON format", e);
             return;
         }
-        NCGenesDOCMessageRunnable runnable = new NCGenesDOCMessageRunnable();
-        runnable.setJsonMessage(jsonMessage);
-        runnable.setPipelineBeanService(pipelineBeanService);
-        Executors.newSingleThreadExecutor().submit(runnable);
+        SequencerRun sequencerRun = null;
+        Set<HTSFSample> htsfSampleSet = new HashSet<HTSFSample>();
+        WorkflowRun workflowRun = null;
+        Account account = null;
+
+        try {
+
+            String accountName = jsonMessage.getString("account_name");
+
+            try {
+                account = pipelineBeanService.getMaPSeqDAOBean().getAccountDAO().findByName(accountName);
+            } catch (MaPSeqDAOException e) {
+            }
+
+            if (account == null) {
+                logger.error("Must register account first");
+                return;
+            }
+
+            JSONArray entityArray = jsonMessage.getJSONArray("entities");
+
+            for (int i = 0; i < entityArray.length(); ++i) {
+
+                JSONObject entityJSONObject = entityArray.getJSONObject(i);
+
+                if (entityJSONObject.has("entity_type")) {
+
+                    String entityType = entityJSONObject.getString("entity_type");
+
+                    if (SequencerRun.class.getSimpleName().equals(entityType)) {
+                        sequencerRun = EntityUtil.getSequencerRun(pipelineBeanService.getMaPSeqDAOBean(),
+                                entityJSONObject);
+                    }
+
+                    if (HTSFSample.class.getSimpleName().equals(entityType)) {
+                        HTSFSample htsfSample = EntityUtil.getHTSFSample(pipelineBeanService.getMaPSeqDAOBean(),
+                                entityJSONObject);
+                        htsfSampleSet.add(htsfSample);
+                    }
+
+                    if (WorkflowRun.class.getSimpleName().equals(entityType)) {
+                        workflowRun = EntityUtil.getWorkflowRun(pipelineBeanService.getMaPSeqDAOBean(), "NCGenesDOC",
+                                entityJSONObject, account);
+                    }
+
+                }
+
+            }
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+            return;
+        }
+
+        if (workflowRun == null) {
+            logger.warn("Invalid JSON...not running anything");
+            return;
+        }
+
+        if (sequencerRun == null && htsfSampleSet.size() == 0) {
+            logger.warn("Invalid JSON...not running anything");
+            workflowRun.setStatus(WorkflowRunStatusType.FAILED);
+        }
+
+        try {
+            Long workflowRunId = pipelineBeanService.getMaPSeqDAOBean().getWorkflowRunDAO().save(workflowRun);
+            workflowRun.setId(workflowRunId);
+        } catch (MaPSeqDAOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            WorkflowPlan workflowPlan = new WorkflowPlan();
+            workflowPlan.setWorkflowRun(workflowRun);
+            if (htsfSampleSet.size() > 0) {
+                workflowPlan.setHTSFSamples(htsfSampleSet);
+            }
+            if (sequencerRun != null) {
+                workflowPlan.setSequencerRun(sequencerRun);
+            }
+            pipelineBeanService.getMaPSeqDAOBean().getWorkflowPlanDAO().save(workflowPlan);
+        } catch (MaPSeqDAOException e) {
+            e.printStackTrace();
+        }
 
     }
 
