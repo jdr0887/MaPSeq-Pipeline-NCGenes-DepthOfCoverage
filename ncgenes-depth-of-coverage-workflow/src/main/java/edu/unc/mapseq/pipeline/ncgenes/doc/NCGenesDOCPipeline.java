@@ -1,11 +1,10 @@
 package edu.unc.mapseq.pipeline.ncgenes.doc;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -54,13 +53,9 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
 
     @Override
     public String getVersion() {
-        Properties props = new Properties();
-        try {
-            props.load(this.getClass().getResourceAsStream("pipeline.properties"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return props.getProperty("version", "0.0.1-SNAPSHOT");
+        ResourceBundle bundle = ResourceBundle.getBundle("edu/unc/mapseq/pipeline/ncgenes/doc/pipeline");
+        String version = bundle.getString("version");
+        return StringUtils.isNotEmpty(version) ? version : "0.0.1-SNAPSHOT";
     }
 
     @Override
