@@ -2,13 +2,13 @@
   <parent>
     <groupId>edu.unc.mapseq.pipelines</groupId>
     <artifactId>ncgenes-depth-of-coverage</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6-SNAPSHOT</version>
   </parent>
   <name>MaPSeq :: Pipelines :: NCGenes Depth Of Coverage :: Messaging</name>
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage</groupId>
   <artifactId>ncgenes-depth-of-coverage-messaging</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
