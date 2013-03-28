@@ -25,10 +25,10 @@ public class NCGenesDOCMessageTest {
             Destination destination = session.createQueue("queue/ncgenes.doc");
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            // String value =
-            // "{\"account_name\":\"powen\",\"entities\":[{\"entity_type\":\"HTSF Sample\",\"guid\":\"27354\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.interval_list.version\",\"value\":\"3\"},{\"name\":\"SAMToolsView.dx.id\",\"value\":\"2\"}]},{\"entity_type\":\"Workflow run\",\"name\":\"NCG_00007_Analysis_Pipeline_Run\"}]}";
-            // producer.send(session.createTextMessage(value));
-
+            String format = "{\"account_name\": \"%s\",\"entities\": [{\"attributes\": [{\"name\": \"GATKDepthOfCoverage.intervalList\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.prefix\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\": \"%s\"}],\"entity_type\": \"HTSFSample\",\"guid\": \"%d\"},{\"entity_type\": \"WorkflowRun\",\"name\": \"%s\"}]}";
+            producer.send(session.createTextMessage(String.format(format, "rc_renci.svc",
+                    "/proj/renci/sequence_analysis/annotation/abeast/NCGenes/13/exons_pm_0_v13.interval_list",
+                    "PREFIX", "1,2,5,8,10,15,20,30,50", 27483L, "UNIQUEJOBNAME")));
         } catch (JMSException e) {
             e.printStackTrace();
         } finally {
@@ -41,5 +41,4 @@ public class NCGenesDOCMessageTest {
         }
 
     }
-
 }
