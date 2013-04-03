@@ -16,8 +16,8 @@
       <artifactId>mapseq-pipeline-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>edu.unc.mapseq.mapseq-modules</groupId>
-      <artifactId>mapseq-module-gatk</artifactId>
+      <groupId>edu.unc.mapseq</groupId>
+      <artifactId>mapseq-modules</artifactId>
     </dependency>
   </dependencies>
   <build>
