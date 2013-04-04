@@ -258,8 +258,8 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
 
             try {
                 CommandInput commandInput = new CommandInput();
-                commandInput.setCommand(String.format("/bin/cp %s/%s /tmp/", outputDirectory.getAbsolutePath(), bamFile
-                        .getName().replace(".bam", prefix + ".*")));
+                commandInput.setCommand(String.format("/bin/cp %s/%s.* /tmp/", outputDirectory.getAbsolutePath(),
+                        prefix));
                 CommandOutput commandOutput = executor.execute(commandInput, mapseqrc);
                 logger.info("commandOutput.getExitCode(): {}", commandOutput.getExitCode());
             } catch (ExecutorException e) {
