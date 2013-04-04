@@ -31,7 +31,7 @@ public class NCGenesDOCPipelineExecutorTask extends TimerTask {
     @Override
     public void run() {
         logger.info("ENTERING run()");
-        
+
         logger.info(String.format("ActiveCount: %d, TaskCount: %d, CompletedTaskCount: %d", tpe.getActiveCount(),
                 tpe.getTaskCount(), tpe.getCompletedTaskCount()));
 
