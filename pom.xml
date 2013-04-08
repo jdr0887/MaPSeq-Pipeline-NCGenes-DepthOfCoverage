@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.unc.mapseq.pipelines</groupId>
   <artifactId>ncgenes-depth-of-coverage</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>https://ci-dev.renci.org/site/mapseq</url>
   <properties>
@@ -176,7 +176,7 @@
       <dependency>
       	<groupId>edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage</groupId>
       	<artifactId>ncgenes-depth-of-coverage-workflow</artifactId>
-      	<version>0.1.0</version>
+      	<version>0.1.1-SNAPSHOT</version>
       </dependency>
       <dependency>
       	<groupId>junit</groupId>
