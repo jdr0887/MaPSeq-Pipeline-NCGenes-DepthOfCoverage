@@ -185,8 +185,7 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INPUTFILE, bamFile.getAbsolutePath());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INTERVALS,
                         intervalListFile.getAbsolutePath());
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OUTPUTPREFIX,
-                        bamFile.getName().replace(".bam", "." + prefix));
+                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OUTPUTPREFIX, prefix);
                 graph.addVertex(gatkGeneDepthOfCoverageJob);
 
             } catch (Exception e) {
@@ -223,9 +222,10 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
         }
 
         if (getWorkflowPlan().getHTSFSamples() != null) {
-            logger.info("htsfSampleSet.size(): {}", htsfSampleSet.size());
             htsfSampleSet.addAll(getWorkflowPlan().getHTSFSamples());
         }
+
+        logger.info("htsfSampleSet.size(): {}", htsfSampleSet.size());
 
         for (HTSFSample htsfSample : htsfSampleSet) {
 
@@ -252,6 +252,13 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 }
             }
 
+            if (prefix == null) {
+                logger.warn("GATKDepthOfCoverage.prefix doesn't exist");
+                return;
+            }
+
+            logger.info("GATKDepthOfCoverage.prefix = {}", prefix);
+
             Set<FileData> fileDataSet = htsfSample.getFileDatas();
 
             Set<String> entityAttributeNameSet = new HashSet<String>();
@@ -265,7 +272,7 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
             Collection<File> potentialFileList = FileUtils.listFiles(
                     outputDirectory,
                     FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
-                            FileFilterUtils.suffixFileFilter(".coverage.sample_summary")), null);
+                            FileFilterUtils.suffixFileFilter(".sample_summary")), null);
 
             if (potentialFileList != null && potentialFileList.size() > 0) {
                 File docFile = potentialFileList.iterator().next();
@@ -313,7 +320,7 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
             potentialFileList = FileUtils.listFiles(
                     outputDirectory,
                     FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
-                            FileFilterUtils.suffixFileFilter(".coverage.sample_interval_summary")), null);
+                            FileFilterUtils.suffixFileFilter(".sample_interval_summary")), null);
 
             Long totalPassedReads = null;
             for (EntityAttribute attribute : attributeSet) {
@@ -396,8 +403,8 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
 
             try {
                 CommandInput commandInput = new CommandInput();
-                commandInput.setCommand(String.format("/bin/cp %s/%s.* /tmp/", outputDirectory.getAbsolutePath(),
-                        prefix));
+                commandInput.setCommand(String.format("/bin/cp %s/*.%s.coverage.* /tmp/",
+                        outputDirectory.getAbsolutePath(), prefix));
                 CommandOutput commandOutput = executor.execute(commandInput, mapseqrc);
                 logger.info("commandOutput.getExitCode(): {}", commandOutput.getExitCode());
             } catch (ExecutorException e) {
