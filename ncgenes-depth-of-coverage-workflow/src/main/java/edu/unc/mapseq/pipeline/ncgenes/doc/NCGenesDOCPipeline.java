@@ -330,6 +330,10 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 }
             }
 
+            if (totalPassedReads == null) {
+                logger.warn("SAMToolsFlagstat.totalPassedReads is null");
+            }
+
             if (potentialFileList != null && potentialFileList.size() > 0) {
                 try {
                     File docFile = potentialFileList.iterator().next();
@@ -341,6 +345,8 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                         totalCoverageCount += Long.valueOf(StringUtils.split(line)[1].trim());
                     }
                     br.close();
+
+                    logger.info("totalCoverageCount = {}", totalCoverageCount);
 
                     String totalCoverageCountKey = String.format(
                             "GATKDepthOfCoverage.%s.sample_interval_summary.totalCoverageCount", prefix);
@@ -358,16 +364,18 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
 
                     String numberOnTargetKey = String.format("%s.numberOnTarget", prefix);
 
-                    if (synchSet.contains(numberOnTargetKey)) {
-                        for (EntityAttribute attribute : attributeSet) {
-                            if (attribute.getName().equals(numberOnTargetKey) && totalPassedReads != null) {
-                                attribute.setValue((double) totalCoverageCount / (totalPassedReads * 100) + "");
-                                break;
+                    if (totalPassedReads != null) {
+                        if (synchSet.contains(numberOnTargetKey)) {
+                            for (EntityAttribute attribute : attributeSet) {
+                                if (attribute.getName().equals(numberOnTargetKey) && totalPassedReads != null) {
+                                    attribute.setValue((double) totalCoverageCount / (totalPassedReads * 100) + "");
+                                    break;
+                                }
                             }
+                        } else {
+                            attributeSet.add(new EntityAttribute(numberOnTargetKey, (double) totalCoverageCount
+                                    / (totalPassedReads * 100) + ""));
                         }
-                    } else {
-                        attributeSet.add(new EntityAttribute(numberOnTargetKey, (double) totalCoverageCount
-                                / (totalPassedReads * 100) + ""));
                     }
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
