@@ -28,7 +28,9 @@ public class NCGenesDOCMessageTest {
             String format = "{\"account_name\": \"%s\",\"entities\": [{\"attributes\": [{\"name\": \"GATKDepthOfCoverage.intervalList\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.prefix\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\": \"%s\"}],\"entity_type\": \"HTSFSample\",\"guid\": \"%d\"},{\"entity_type\": \"WorkflowRun\",\"name\": \"%s\"}]}";
             producer.send(session.createTextMessage(String.format(format, "rc_renci.svc",
                     "/proj/renci/sequence_analysis/annotation/abeast/NCGenes/13/exons_pm_0_v13.interval_list",
-                    "NCG_00084.27483", "1,2,5,8,10,15,20,30,50", 27483L, "UNIQUEJOBNAME")));
+                    "NCG_00009.52422", "1,2,5,8,10,15,20,30,50", 52422L, "UNIQUEJOBNAME")));
+
+            // NCG_00009.52422.DOC.ebb2f3fe-a11b-11e2-9390-001ec9393b7a
         } catch (JMSException e) {
             e.printStackTrace();
         } finally {
