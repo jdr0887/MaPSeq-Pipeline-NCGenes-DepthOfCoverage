@@ -11,18 +11,18 @@ public class NCGenesDOCPipelineExecutorService {
 
     private final Timer mainTimer = new Timer();
 
-    private NCGenesDOCPipelineBeanService pipelineBeanService;
+    private NCGenesDOCPipelineExecutorTask task;
+
+    private Long period = Long.valueOf(5 * 60 * 1000);
+
+    public NCGenesDOCPipelineExecutorService() {
+        super();
+    }
 
     public void start() throws Exception {
-        logger.info("ENTERING stop()");
-
+        logger.info("ENTERING start()");
         long delay = 1 * 60 * 1000; // 1 minute
-        long period = 5 * 60 * 1000; // 5 minutes
-
-        NCGenesDOCPipelineExecutorTask task = new NCGenesDOCPipelineExecutorTask();
-        task.setPipelineBeanService(pipelineBeanService);
         mainTimer.scheduleAtFixedRate(task, delay, period);
-
     }
 
     public void stop() throws Exception {
@@ -31,12 +31,20 @@ public class NCGenesDOCPipelineExecutorService {
         mainTimer.cancel();
     }
 
-    public NCGenesDOCPipelineBeanService getPipelineBeanService() {
-        return pipelineBeanService;
+    public NCGenesDOCPipelineExecutorTask getTask() {
+        return task;
     }
 
-    public void setPipelineBeanService(NCGenesDOCPipelineBeanService pipelineBeanService) {
-        this.pipelineBeanService = pipelineBeanService;
+    public void setTask(NCGenesDOCPipelineExecutorTask task) {
+        this.task = task;
+    }
+
+    public Long getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(Long period) {
+        this.period = period;
     }
 
 }
