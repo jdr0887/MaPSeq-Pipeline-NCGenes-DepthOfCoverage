@@ -6,8 +6,18 @@ public class NCGenesDOCPipelineBeanService extends AbstractPipelineBeanService {
 
     private String referenceSequence;
 
+    private String siteName;
+
     public NCGenesDOCPipelineBeanService() {
         super();
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 
     public String getReferenceSequence() {
