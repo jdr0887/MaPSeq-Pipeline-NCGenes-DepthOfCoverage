@@ -7,6 +7,7 @@
       <cm:property name="corePoolSize" value="100" />
       <cm:property name="maxPoolSize" value="100" />
       <cm:property name="period" value="5" />
+      <cm:property name="siteName" value="Kure" />
       <cm:property name="reference-sequence"
         value="$NCGENESDOC_REFERENCES_DIRECTORY/BUILD.37.1/bwa061sam0118/BUILD.37.1.sorted.shortid.fa" />
     </cm:default-properties>
@@ -43,6 +44,7 @@
     <property name="mapseqConfigurationService" ref="mapseqConfigurationService" />
     <property name="maPSeqDAOBean" ref="maPSeqDAOBean" />
     <property name="referenceSequence" value="${reference-sequence}" />
+    <property name="siteName" value="${siteName}" />
     <cm:managed-properties persistent-id="edu.unc.mapseq.pipeline.ncgenes.doc" update-strategy="container-managed" />
   </bean>
 
