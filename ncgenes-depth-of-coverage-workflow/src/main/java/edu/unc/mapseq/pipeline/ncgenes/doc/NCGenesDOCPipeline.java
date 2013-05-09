@@ -107,12 +107,6 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 continue;
             }
 
-            SequencerRun sequencerRun = htsfSample.getSequencerRun();
-            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample.getName(), getName()
-                    .replace("DOC", ""));
-            File tmpDir = new File(outputDirectory, "tmp");
-            tmpDir.mkdirs();
-
             Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
             Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
             while (attributeIter.hasNext()) {
@@ -166,6 +160,7 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 // new job
                 CondorJob gatkGeneDepthOfCoverageJob = PipelineJobFactory.createJob(++count,
                         GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample);
+                gatkGeneDepthOfCoverageJob.setSiteName(getPipelineBeanService().getSiteName());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.PHONEHOME,
                         GATKPhoneHomeType.NO_ET.toString());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE,
@@ -234,8 +229,8 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
             }
 
             SequencerRun sequencerRun = htsfSample.getSequencerRun();
-            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample.getName(), getName()
-                    .replace("DOC", ""));
+            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample,
+                    getName().replace("DOC", ""));
 
             String prefix = null;
             Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
