@@ -40,15 +40,16 @@ import edu.unc.mapseq.module.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.gatk.GATKTableRecalibration;
 import edu.unc.mapseq.pipeline.AbstractPipeline;
+import edu.unc.mapseq.pipeline.PipelineBeanService;
 import edu.unc.mapseq.pipeline.PipelineException;
 import edu.unc.mapseq.pipeline.PipelineJobFactory;
 import edu.unc.mapseq.pipeline.PipelineUtil;
 
-public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanService> {
+public class NCGenesDOCPipeline extends AbstractPipeline {
 
     private final Logger logger = LoggerFactory.getLogger(NCGenesDOCPipeline.class);
 
-    private NCGenesDOCPipelineBeanService pipelineBeanService;
+    private PipelineBeanService pipelineBeanService;
 
     public NCGenesDOCPipeline() {
         super();
@@ -100,6 +101,9 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
         }
 
         logger.info("htsfSampleSet.size(): {}", htsfSampleSet.size());
+
+        String siteName = getPipelineBeanService().getAttributes().get("siteName");
+        String referenceSequence = getPipelineBeanService().getAttributes().get("referenceSequence");
 
         for (HTSFSample htsfSample : htsfSampleSet) {
 
@@ -160,14 +164,13 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
                 // new job
                 CondorJob gatkGeneDepthOfCoverageJob = PipelineJobFactory.createJob(++count,
                         GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample);
-                gatkGeneDepthOfCoverageJob.setSiteName(getPipelineBeanService().getSiteName());
+                gatkGeneDepthOfCoverageJob.setSiteName(siteName);
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.PHONEHOME,
                         GATKPhoneHomeType.NO_ET.toString());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE,
                         GATKDownsamplingType.NONE.toString());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INTERVALMERGING, "OVERLAPPING_ONLY");
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.REFERENCESEQUENCE,
-                        getPipelineBeanService().getReferenceSequence());
+                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.REFERENCESEQUENCE, referenceSequence);
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.VALIDATIONSTRICTNESS, "LENIENT");
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OMITDEPTHOUTPUTATEACHBASE);
 
@@ -418,11 +421,11 @@ public class NCGenesDOCPipeline extends AbstractPipeline<NCGenesDOCPipelineBeanS
 
     }
 
-    public NCGenesDOCPipelineBeanService getPipelineBeanService() {
+    public PipelineBeanService getPipelineBeanService() {
         return pipelineBeanService;
     }
 
-    public void setPipelineBeanService(NCGenesDOCPipelineBeanService pipelineBeanService) {
+    public void setPipelineBeanService(PipelineBeanService pipelineBeanService) {
         this.pipelineBeanService = pipelineBeanService;
     }
 
