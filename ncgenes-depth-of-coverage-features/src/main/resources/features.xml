@@ -3,7 +3,7 @@
   <feature name="mapseq-pipeline-ncgenes-depth-of-coverage" version="${project.version}" resolver="(obr)">
     <bundle>mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-workflow/${project.version}</bundle>
     <bundle>mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-commands/${project.version}</bundle>
-    <bundle start-level="100">mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-exeuctor/${project.version}</bundle>
+    <bundle start-level="100">mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-executor/${project.version}</bundle>
     <bundle start-level="100">mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-messaging/${project.version}</bundle>
   </feature>
 
