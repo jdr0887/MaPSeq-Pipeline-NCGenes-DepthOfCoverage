@@ -2,7 +2,7 @@
   <parent>
     <groupId>edu.unc</groupId>
     <artifactId>mapseq</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
   </parent>
   <name>MaPSeq :: Pipelines :: NCGenes Depth Of Coverage</name>
   <modelVersion>4.0.0</modelVersion>
@@ -61,6 +61,7 @@
   </dependencyManagement>
   <modules>
     <module>ncgenes-depth-of-coverage-workflow</module>
+    <module>ncgenes-depth-of-coverage-executor</module>
     <module>ncgenes-depth-of-coverage-commands</module>
     <module>ncgenes-depth-of-coverage-features</module>
     <module>ncgenes-depth-of-coverage-messaging</module>
