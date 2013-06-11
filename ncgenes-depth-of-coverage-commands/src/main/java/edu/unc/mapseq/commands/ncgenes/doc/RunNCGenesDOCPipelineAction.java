@@ -19,7 +19,7 @@ import edu.unc.mapseq.config.MaPSeqConfigurationService;
 import edu.unc.mapseq.dao.MaPSeqDAOBean;
 import edu.unc.mapseq.dao.model.HTSFSample;
 
-@Command(scope = "mapseq", name = "run-ncgenes-doc-pipeline", description = "Run NCGenes DepthOfCoverage")
+@Command(scope = "ncgenes-doc", name = "run-pipeline", description = "Run NCGenes DepthOfCoverage")
 public class RunNCGenesDOCPipelineAction extends AbstractAction {
 
     @Argument(index = 0, name = "htsfSampleId", description = "HTFSSample Identifier", required = true, multiValued = false)
