@@ -37,9 +37,9 @@ public class RunNCGenesDOCPipelineAction extends AbstractAction {
     @Argument(index = 4, name = "intervalList", description = "Interval List file", required = false, multiValued = false)
     private String intervalList;
 
-    private MaPSeqDAOBean mapseqDAOBean;
+    private MaPSeqDAOBean maPSeqDAOBean;
 
-    private MaPSeqConfigurationService mapseqConfigurationService;
+    private MaPSeqConfigurationService maPSeqConfigurationService;
 
     public RunNCGenesDOCPipelineAction() {
         super();
@@ -50,7 +50,7 @@ public class RunNCGenesDOCPipelineAction extends AbstractAction {
 
         HTSFSample sample = null;
         try {
-            sample = mapseqDAOBean.getHTSFSampleDAO().findById(htsfSampleId);
+            sample = maPSeqDAOBean.getHTSFSampleDAO().findById(htsfSampleId);
         } catch (Exception e1) {
         }
 
@@ -69,7 +69,7 @@ public class RunNCGenesDOCPipelineAction extends AbstractAction {
         }
 
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(String.format("nio://%s:61616",
-                mapseqConfigurationService.getWebServiceHost("localhost")));
+                maPSeqConfigurationService.getWebServiceHost("localhost")));
 
         Connection connection = null;
         Session session = null;
@@ -134,28 +134,28 @@ public class RunNCGenesDOCPipelineAction extends AbstractAction {
         this.summaryCoverageThreshold = summaryCoverageThreshold;
     }
 
-    public MaPSeqDAOBean getMapseqDAOBean() {
-        return mapseqDAOBean;
-    }
-
-    public void setMapseqDAOBean(MaPSeqDAOBean mapseqDAOBean) {
-        this.mapseqDAOBean = mapseqDAOBean;
-    }
-
-    public MaPSeqConfigurationService getMapseqConfigurationService() {
-        return mapseqConfigurationService;
-    }
-
-    public void setMapseqConfigurationService(MaPSeqConfigurationService mapseqConfigurationService) {
-        this.mapseqConfigurationService = mapseqConfigurationService;
-    }
-
     public String getIntervalList() {
         return intervalList;
     }
 
     public void setIntervalList(String intervalList) {
         this.intervalList = intervalList;
+    }
+
+    public MaPSeqDAOBean getMaPSeqDAOBean() {
+        return maPSeqDAOBean;
+    }
+
+    public void setMaPSeqDAOBean(MaPSeqDAOBean maPSeqDAOBean) {
+        this.maPSeqDAOBean = maPSeqDAOBean;
+    }
+
+    public MaPSeqConfigurationService getMaPSeqConfigurationService() {
+        return maPSeqConfigurationService;
+    }
+
+    public void setMaPSeqConfigurationService(MaPSeqConfigurationService maPSeqConfigurationService) {
+        this.maPSeqConfigurationService = maPSeqConfigurationService;
     }
 
 }
