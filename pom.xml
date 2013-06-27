@@ -10,6 +10,9 @@
   <artifactId>ncgenes-depth-of-coverage</artifactId>
   <version>0.2.8-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <properties>
+    <mapseq.modules.version>0.0.5</mapseq.modules.version>
+  </properties>
   <issueManagement>
     <system>gForge</system>
     <url>https://code.renci.org/gf/project/mps_ncg_doc_pl/tracker/</url>
@@ -45,7 +48,7 @@
       <dependency>
       	<groupId>edu.unc.mapseq</groupId>
       	<artifactId>modules</artifactId>
-      	<version>0.0.5</version>
+      	<version>${mapseq.modules.version}</version>
       </dependency>
       <dependency>
       	<groupId>edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage</groupId>
