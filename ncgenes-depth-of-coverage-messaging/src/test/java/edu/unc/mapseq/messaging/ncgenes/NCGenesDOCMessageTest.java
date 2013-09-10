@@ -24,7 +24,7 @@ public class NCGenesDOCMessageTest {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createQueue("queue/ncgenes.doc");
             MessageProducer producer = session.createProducer(destination);
-            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             String format = "{\"account_name\": \"%s\",\"entities\": [{\"attributes\": [{\"name\": \"GATKDepthOfCoverage.intervalList\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.prefix\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\": \"%s\"}],\"entity_type\": \"HTSFSample\",\"guid\": \"%d\"},{\"entity_type\": \"WorkflowRun\",\"name\": \"%s\"}]}";
             producer.send(session.createTextMessage(String.format(format, "rc_renci.svc",
                     "/proj/renci/sequence_analysis/annotation/abeast/NCGenes/13/exons_pm_0_v13.interval_list",
