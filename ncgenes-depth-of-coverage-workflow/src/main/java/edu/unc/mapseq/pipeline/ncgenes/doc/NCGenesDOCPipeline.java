@@ -246,7 +246,7 @@ public class NCGenesDOCPipeline extends AbstractPipeline {
 
             SequencerRun sequencerRun = htsfSample.getSequencerRun();
             File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample,
-                    getName().replace("DOC", ""));
+                    getName().replace("DOC", ""), getVersion());
 
             String prefix = null;
             Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
