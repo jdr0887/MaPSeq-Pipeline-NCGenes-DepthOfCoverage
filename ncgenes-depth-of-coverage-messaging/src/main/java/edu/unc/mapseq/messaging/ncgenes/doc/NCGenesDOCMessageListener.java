@@ -22,14 +22,14 @@ import edu.unc.mapseq.dao.model.SequencerRun;
 import edu.unc.mapseq.dao.model.WorkflowPlan;
 import edu.unc.mapseq.dao.model.WorkflowRun;
 import edu.unc.mapseq.dao.model.WorkflowRunStatusType;
-import edu.unc.mapseq.pipeline.EntityUtil;
-import edu.unc.mapseq.pipeline.PipelineBeanService;
+import edu.unc.mapseq.workflow.EntityUtil;
+import edu.unc.mapseq.workflow.WorkflowBeanService;
 
 public class NCGenesDOCMessageListener implements MessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(NCGenesDOCMessageListener.class);
 
-    private PipelineBeanService pipelineBeanService;
+    private WorkflowBeanService workflowBeanService;
 
     public NCGenesDOCMessageListener() {
         super();
@@ -80,7 +80,7 @@ public class NCGenesDOCMessageListener implements MessageListener {
             String accountName = jsonMessage.getString("account_name");
 
             try {
-                account = pipelineBeanService.getMaPSeqDAOBean().getAccountDAO().findByName(accountName);
+                account = workflowBeanService.getMaPSeqDAOBean().getAccountDAO().findByName(accountName);
             } catch (MaPSeqDAOException e) {
             }
 
@@ -100,18 +100,18 @@ public class NCGenesDOCMessageListener implements MessageListener {
                     String entityType = entityJSONObject.getString("entity_type");
 
                     if (SequencerRun.class.getSimpleName().equals(entityType)) {
-                        sequencerRun = EntityUtil.getSequencerRun(pipelineBeanService.getMaPSeqDAOBean(),
+                        sequencerRun = EntityUtil.getSequencerRun(workflowBeanService.getMaPSeqDAOBean(),
                                 entityJSONObject);
                     }
 
                     if (HTSFSample.class.getSimpleName().equals(entityType)) {
-                        HTSFSample htsfSample = EntityUtil.getHTSFSample(pipelineBeanService.getMaPSeqDAOBean(),
+                        HTSFSample htsfSample = EntityUtil.getHTSFSample(workflowBeanService.getMaPSeqDAOBean(),
                                 entityJSONObject);
                         htsfSampleSet.add(htsfSample);
                     }
 
                     if (WorkflowRun.class.getSimpleName().equals(entityType)) {
-                        workflowRun = EntityUtil.getWorkflowRun(pipelineBeanService.getMaPSeqDAOBean(), "NCGenesDOC",
+                        workflowRun = EntityUtil.getWorkflowRun(workflowBeanService.getMaPSeqDAOBean(), "NCGenesDOC",
                                 entityJSONObject, account);
                     }
 
@@ -134,7 +134,7 @@ public class NCGenesDOCMessageListener implements MessageListener {
         }
 
         try {
-            Long workflowRunId = pipelineBeanService.getMaPSeqDAOBean().getWorkflowRunDAO().save(workflowRun);
+            Long workflowRunId = workflowBeanService.getMaPSeqDAOBean().getWorkflowRunDAO().save(workflowRun);
             workflowRun.setId(workflowRunId);
         } catch (MaPSeqDAOException e) {
             e.printStackTrace();
@@ -149,19 +149,19 @@ public class NCGenesDOCMessageListener implements MessageListener {
             if (sequencerRun != null) {
                 workflowPlan.setSequencerRun(sequencerRun);
             }
-            pipelineBeanService.getMaPSeqDAOBean().getWorkflowPlanDAO().save(workflowPlan);
+            workflowBeanService.getMaPSeqDAOBean().getWorkflowPlanDAO().save(workflowPlan);
         } catch (MaPSeqDAOException e) {
             e.printStackTrace();
         }
 
     }
 
-    public PipelineBeanService getPipelineBeanService() {
-        return pipelineBeanService;
+    public WorkflowBeanService getWorkflowBeanService() {
+        return workflowBeanService;
     }
 
-    public void setPipelineBeanService(PipelineBeanService pipelineBeanService) {
-        this.pipelineBeanService = pipelineBeanService;
+    public void setWorkflowBeanService(WorkflowBeanService workflowBeanService) {
+        this.workflowBeanService = workflowBeanService;
     }
 
 }
