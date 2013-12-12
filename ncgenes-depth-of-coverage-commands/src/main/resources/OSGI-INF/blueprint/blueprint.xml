@@ -2,8 +2,8 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" default-activation="lazy">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="ncgenes-doc/run-pipeline">
-      <action class="edu.unc.mapseq.commands.ncgenes.doc.RunNCGenesDOCPipelineAction">
+    <command name="ncgenes-doc/run-workflow">
+      <action class="edu.unc.mapseq.commands.ncgenes.doc.RunNCGenesDOCWorkflowAction">
         <property name="maPSeqDAOBean" ref="maPSeqDAOBean" />
         <property name="maPSeqConfigurationService" ref="maPSeqConfigurationService" />
       </action>

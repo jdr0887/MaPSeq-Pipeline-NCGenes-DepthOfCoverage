@@ -4,13 +4,13 @@
 
   <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
 
-  <reference id="NCGenesDOCPipelineBeanService" interface="edu.unc.mapseq.pipeline.PipelineBeanService"
-    component-name="NCGenesDOCPipelineBeanService" />
+  <reference id="NCGenesDOCWorkflowBeanService" interface="edu.unc.mapseq.workflow.WorkflowBeanService"
+    component-name="NCGenesDOCWorkflowBeanService" />
 
   <bean id="NCGenesDOCMessagingService" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessagingService"
     init-method="start" destroy-method="stop" activation="eager">
     <property name="connectionFactory" ref="connectionFactory" />
-    <property name="pipelineBeanService" ref="NCGenesDOCPipelineBeanService" />
+    <property name="workflowBeanService" ref="NCGenesDOCWorkflowBeanService" />
     <property name="destinationName" value="queue/ncgenes.doc" />
   </bean>
 
