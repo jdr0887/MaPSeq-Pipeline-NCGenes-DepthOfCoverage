@@ -78,7 +78,7 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = session.createQueue("queue/ncgenes.doc");
             MessageProducer producer = session.createProducer(destination);
-            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             if (StringUtils.isNotEmpty(intervalList)) {
                 String format = "{\"account_name\":\"%s\",\"entities\":[{\"entity_type\":\"HTSFSample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
                 producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
