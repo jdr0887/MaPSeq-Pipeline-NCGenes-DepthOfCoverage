@@ -97,7 +97,8 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
             }
 
             SequencerRun sequencerRun = htsfSample.getSequencerRun();
-            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample, getName(), getVersion());
+            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample,
+                    getName().replace("DOC", ""), getVersion());
 
             Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
             Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
