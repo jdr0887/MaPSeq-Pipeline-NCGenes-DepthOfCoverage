@@ -96,6 +96,9 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
                 continue;
             }
 
+            SequencerRun sequencerRun = htsfSample.getSequencerRun();
+            File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample, getName(), getVersion());
+
             Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
             Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
             while (attributeIter.hasNext()) {
@@ -149,6 +152,7 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
                 // new job
                 CondorJob gatkGeneDepthOfCoverageJob = WorkflowJobFactory.createJob(++count,
                         GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample);
+                gatkGeneDepthOfCoverageJob.setInitialDirectory(outputDirectory);
                 gatkGeneDepthOfCoverageJob.setSiteName(siteName);
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.PHONEHOME,
                         GATKPhoneHomeType.NO_ET.toString());
@@ -168,6 +172,7 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INPUTFILE, bamFile.getAbsolutePath());
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INTERVALS,
                         intervalListFile.getAbsolutePath());
+
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OUTPUTPREFIX, prefix);
                 graph.addVertex(gatkGeneDepthOfCoverageJob);
 
@@ -287,11 +292,6 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
 
             }
 
-            potentialFileList = FileUtils.listFiles(
-                    outputDirectory,
-                    FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
-                            FileFilterUtils.suffixFileFilter(".sample_interval_summary")), null);
-
             Long totalPassedReads = null;
             for (EntityAttribute attribute : attributeSet) {
                 if ("SAMToolsFlagstat.totalPassedReads".equals(attribute.getName())) {
@@ -303,6 +303,11 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
             if (totalPassedReads == null) {
                 logger.warn("SAMToolsFlagstat.totalPassedReads is null");
             }
+
+            potentialFileList = FileUtils.listFiles(
+                    outputDirectory,
+                    FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
+                            FileFilterUtils.suffixFileFilter(".sample_interval_summary")), null);
 
             if (potentialFileList != null && potentialFileList.size() > 0) {
                 try {
