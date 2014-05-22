@@ -153,7 +153,7 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
                 // new job
                 CondorJob gatkGeneDepthOfCoverageJob = WorkflowJobFactory.createJob(++count,
                         GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample);
-                gatkGeneDepthOfCoverageJob.setInitialDirectory(outputDirectory);
+                gatkGeneDepthOfCoverageJob.setInitialDirectory(outputDirectory.getAbsolutePath());
                 gatkGeneDepthOfCoverageJob.setSiteName(siteName);
                 gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.PHONEHOME,
                         GATKPhoneHomeType.NO_ET.toString());
