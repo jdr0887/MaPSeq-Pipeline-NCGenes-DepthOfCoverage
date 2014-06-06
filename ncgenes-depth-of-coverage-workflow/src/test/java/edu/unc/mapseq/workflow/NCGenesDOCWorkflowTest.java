@@ -8,9 +8,10 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.junit.Test;
-import org.renci.jlrm.condor.ext.CondorDOTExporter;
 import org.renci.jlrm.condor.CondorJob;
+import org.renci.jlrm.condor.CondorJobBuilder;
 import org.renci.jlrm.condor.CondorJobEdge;
+import org.renci.jlrm.condor.ext.CondorDOTExporter;
 
 import edu.unc.mapseq.module.gatk.GATKDepthOfCoverageCLI;
 
@@ -25,8 +26,8 @@ public class NCGenesDOCWorkflowTest {
         int count = 0;
 
         // new job
-        CondorJob gatkDepthOfCoverageJob = new CondorJob(String.format("%s_%d",
-                GATKDepthOfCoverageCLI.class.getSimpleName(), ++count), null);
+        CondorJob gatkDepthOfCoverageJob = new CondorJobBuilder().name(
+                String.format("%s_%d", GATKDepthOfCoverageCLI.class.getSimpleName(), ++count)).build();
         graph.addVertex(gatkDepthOfCoverageJob);
 
         VertexNameProvider<CondorJob> vnpId = new VertexNameProvider<CondorJob>() {
