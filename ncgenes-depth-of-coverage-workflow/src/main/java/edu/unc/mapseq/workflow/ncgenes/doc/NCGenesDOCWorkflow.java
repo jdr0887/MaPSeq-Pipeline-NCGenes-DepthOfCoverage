@@ -25,6 +25,7 @@ import org.renci.common.exec.CommandOutput;
 import org.renci.common.exec.Executor;
 import org.renci.common.exec.ExecutorException;
 import org.renci.jlrm.condor.CondorJob;
+import org.renci.jlrm.condor.CondorJobBuilder;
 import org.renci.jlrm.condor.CondorJobEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +41,10 @@ import edu.unc.mapseq.module.gatk.GATKDepthOfCoverageCLI;
 import edu.unc.mapseq.module.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.gatk.GATKTableRecalibration;
-import edu.unc.mapseq.workflow.AbstractWorkflow;
 import edu.unc.mapseq.workflow.WorkflowException;
-import edu.unc.mapseq.workflow.WorkflowJobFactory;
 import edu.unc.mapseq.workflow.WorkflowUtil;
+import edu.unc.mapseq.workflow.impl.AbstractWorkflow;
+import edu.unc.mapseq.workflow.impl.WorkflowJobFactory;
 
 public class NCGenesDOCWorkflow extends AbstractWorkflow {
 
@@ -151,30 +152,27 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
             try {
 
                 // new job
-                CondorJob gatkGeneDepthOfCoverageJob = WorkflowJobFactory.createJob(++count,
-                        GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample);
-                gatkGeneDepthOfCoverageJob.setInitialDirectory(outputDirectory.getAbsolutePath());
-                gatkGeneDepthOfCoverageJob.setSiteName(siteName);
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.PHONEHOME,
-                        GATKPhoneHomeType.NO_ET.toString());
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE,
-                        GATKDownsamplingType.NONE.toString());
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INTERVALMERGING, "OVERLAPPING_ONLY");
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.REFERENCESEQUENCE, referenceSequence);
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.VALIDATIONSTRICTNESS, "LENIENT");
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OMITDEPTHOUTPUTATEACHBASE);
+                CondorJobBuilder builder = WorkflowJobFactory
+                        .createJob(++count, GATKDepthOfCoverageCLI.class, getWorkflowPlan(), htsfSample)
+                        .siteName(siteName).initialDirectory(outputDirectory.getAbsolutePath());
+                builder.addArgument(GATKDepthOfCoverageCLI.PHONEHOME, GATKPhoneHomeType.NO_ET.toString())
+                        .addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE, GATKDownsamplingType.NONE.toString())
+                        .addArgument(GATKDepthOfCoverageCLI.INTERVALMERGING, "OVERLAPPING_ONLY")
+                        .addArgument(GATKDepthOfCoverageCLI.REFERENCESEQUENCE, referenceSequence)
+                        .addArgument(GATKDepthOfCoverageCLI.VALIDATIONSTRICTNESS, "LENIENT")
+                        .addArgument(GATKDepthOfCoverageCLI.OMITDEPTHOUTPUTATEACHBASE)
+                        .addArgument(GATKDepthOfCoverageCLI.INPUTFILE, bamFile.getAbsolutePath())
+                        .addArgument(GATKDepthOfCoverageCLI.INTERVALS, intervalListFile.getAbsolutePath())
+                        .addArgument(GATKDepthOfCoverageCLI.OUTPUTPREFIX, prefix);
 
                 if (summaryCoverageThreshold.contains(",")) {
                     for (String sct : StringUtils.split(summaryCoverageThreshold, ",")) {
-                        gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.SUMMARYCOVERAGETHRESHOLD, sct);
+                        builder.addArgument(GATKDepthOfCoverageCLI.SUMMARYCOVERAGETHRESHOLD, sct);
                     }
                 }
 
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INPUTFILE, bamFile.getAbsolutePath());
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.INTERVALS,
-                        intervalListFile.getAbsolutePath());
-
-                gatkGeneDepthOfCoverageJob.addArgument(GATKDepthOfCoverageCLI.OUTPUTPREFIX, prefix);
+                CondorJob gatkGeneDepthOfCoverageJob = builder.build();
+                logger.info(gatkGeneDepthOfCoverageJob.toString());
                 graph.addVertex(gatkGeneDepthOfCoverageJob);
 
             } catch (Exception e) {
