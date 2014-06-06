@@ -7,10 +7,14 @@
   <reference id="NCGenesDOCWorkflowBeanService" interface="edu.unc.mapseq.workflow.WorkflowBeanService"
     component-name="NCGenesDOCWorkflowBeanService" />
 
-  <bean id="NCGenesDOCMessagingService" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessagingService"
+  <bean id="NCGenesDOCMessageListener" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessageListener">
+    <property name="workflowBeanService" ref="NCGenesDOCWorkflowBeanService" />
+  </bean>
+
+  <bean id="NCGenesDOCMessageService" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessageService"
     init-method="start" destroy-method="stop" activation="eager">
     <property name="connectionFactory" ref="connectionFactory" />
-    <property name="workflowBeanService" ref="NCGenesDOCWorkflowBeanService" />
+    <property name="messageListener" ref="NCGenesDOCMessageListener" />
     <property name="destinationName" value="queue/ncgenes.doc" />
   </bean>
 
