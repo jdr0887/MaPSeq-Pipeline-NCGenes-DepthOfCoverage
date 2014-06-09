@@ -37,6 +37,7 @@ import edu.unc.mapseq.dao.model.HTSFSample;
 import edu.unc.mapseq.dao.model.MimeType;
 import edu.unc.mapseq.dao.model.SequencerRun;
 import edu.unc.mapseq.dao.model.Workflow;
+import edu.unc.mapseq.dao.model.WorkflowRun;
 import edu.unc.mapseq.module.gatk.GATKDepthOfCoverageCLI;
 import edu.unc.mapseq.module.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.gatk.GATKPhoneHomeType;
@@ -91,6 +92,8 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
         String siteName = getWorkflowBeanService().getAttributes().get("siteName");
         String referenceSequence = getWorkflowBeanService().getAttributes().get("referenceSequence");
 
+        WorkflowRun workflowRun = getWorkflowPlan().getWorkflowRun();
+
         for (HTSFSample htsfSample : htsfSampleSet) {
 
             if ("Undetermined".equals(htsfSample.getBarcode())) {
@@ -101,18 +104,20 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
             File outputDirectory = createOutputDirectory(sequencerRun.getName(), htsfSample,
                     getName().replace("DOC", ""), getVersion());
 
-            Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
-            Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
-            while (attributeIter.hasNext()) {
-                EntityAttribute attribute = attributeIter.next();
-                if ("GATKDepthOfCoverage.intervalList".equals(attribute.getName())) {
-                    intervalList = attribute.getValue();
-                }
-                if ("GATKDepthOfCoverage.prefix".equals(attribute.getName())) {
-                    prefix = attribute.getValue();
-                }
-                if ("GATKDepthOfCoverage.summaryCoverageThreshold".equals(attribute.getName())) {
-                    summaryCoverageThreshold = attribute.getValue();
+            Set<EntityAttribute> attributeSet = workflowRun.getAttributes();
+            if (attributeSet != null && !attributeSet.isEmpty()) {
+                Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
+                while (attributeIter.hasNext()) {
+                    EntityAttribute attribute = attributeIter.next();
+                    if ("GATKDepthOfCoverage.intervalList".equals(attribute.getName())) {
+                        intervalList = attribute.getValue();
+                    }
+                    if ("GATKDepthOfCoverage.prefix".equals(attribute.getName())) {
+                        prefix = attribute.getValue();
+                    }
+                    if ("GATKDepthOfCoverage.summaryCoverageThreshold".equals(attribute.getName())) {
+                        summaryCoverageThreshold = attribute.getValue();
+                    }
                 }
             }
 
@@ -201,6 +206,8 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
             e1.printStackTrace();
         }
 
+        WorkflowRun workflowRun = getWorkflowPlan().getWorkflowRun();
+
         for (HTSFSample htsfSample : htsfSampleSet) {
 
             if ("Undetermined".equals(htsfSample.getBarcode())) {
@@ -212,11 +219,8 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
                     getName().replace("DOC", ""), getVersion());
 
             String prefix = null;
-            Set<EntityAttribute> attributeSet = htsfSample.getAttributes();
-            if (attributeSet == null) {
-                attributeSet = new HashSet<EntityAttribute>();
-            }
-            if (attributeSet.size() > 0) {
+            Set<EntityAttribute> attributeSet = workflowRun.getAttributes();
+            if (attributeSet != null && !attributeSet.isEmpty()) {
                 Iterator<EntityAttribute> attributeIter = attributeSet.iterator();
                 while (attributeIter.hasNext()) {
                     EntityAttribute attribute = attributeIter.next();
