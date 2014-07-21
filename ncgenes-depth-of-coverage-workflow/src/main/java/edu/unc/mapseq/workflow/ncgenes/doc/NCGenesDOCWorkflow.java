@@ -84,7 +84,7 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
 
         Workflow ncgenesWorkflow = null;
         try {
-            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes");
+            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes").get(0);
         } catch (MaPSeqDAOException e1) {
             e1.printStackTrace();
         }
@@ -201,7 +201,7 @@ public class NCGenesDOCWorkflow extends AbstractWorkflow {
 
         Workflow ncgenesWorkflow = null;
         try {
-            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes");
+            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes").get(0);
         } catch (MaPSeqDAOException e1) {
             e1.printStackTrace();
         }
