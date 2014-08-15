@@ -17,13 +17,13 @@ import org.apache.karaf.shell.console.AbstractAction;
 
 import edu.unc.mapseq.config.MaPSeqConfigurationService;
 import edu.unc.mapseq.dao.MaPSeqDAOBean;
-import edu.unc.mapseq.dao.model.HTSFSample;
+import edu.unc.mapseq.dao.model.Sample;
 
 @Command(scope = "ncgenes-doc", name = "run-workflow", description = "Run NCGenes DepthOfCoverage Workflow")
 public class RunNCGenesDOCWorkflowAction extends AbstractAction {
 
-    @Argument(index = 0, name = "htsfSampleId", description = "HTFSSample Identifier", required = true, multiValued = false)
-    private Long htsfSampleId;
+    @Argument(index = 0, name = "sampleId", description = "Sample Identifier", required = true, multiValued = false)
+    private Long sampleId;
 
     @Argument(index = 1, name = "workflowRunName", description = "WorkflowRun.name", required = true, multiValued = false)
     private String workflowRunName;
@@ -48,9 +48,9 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
     @Override
     public Object doExecute() {
 
-        HTSFSample sample = null;
+        Sample sample = null;
         try {
-            sample = maPSeqDAOBean.getHTSFSampleDAO().findById(htsfSampleId);
+            sample = maPSeqDAOBean.getSampleDAO().findById(sampleId);
         } catch (Exception e1) {
         }
 
@@ -80,13 +80,13 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             if (StringUtils.isNotEmpty(intervalList)) {
-                String format = "{\"account_name\":\"%s\",\"entities\":[{\"entity_type\":\"HTSFSample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
+                String format = "{\"entities\":[{\"entity_type\":\"Sample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
                 producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
-                        htsfSampleId, prefix, summaryCoverageThreshold, intervalList, workflowRunName)));
+                        sampleId, prefix, summaryCoverageThreshold, intervalList, workflowRunName)));
             } else {
-                String format = "{\"account_name\":\"%s\",\"entities\":[{\"entity_type\":\"HTSFSample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
+                String format = "{\"entities\":[{\"entity_type\":\"Sample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
                 producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
-                        htsfSampleId, prefix, summaryCoverageThreshold, workflowRunName)));
+                        sampleId, prefix, summaryCoverageThreshold, workflowRunName)));
             }
         } catch (JMSException e) {
             e.printStackTrace();
@@ -102,12 +102,12 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
         return null;
     }
 
-    public Long getHtsfSampleId() {
-        return htsfSampleId;
+    public Long getSampleId() {
+        return sampleId;
     }
 
-    public void setHtsfSampleId(Long htsfSampleId) {
-        this.htsfSampleId = htsfSampleId;
+    public void setSampleId(Long sampleId) {
+        this.sampleId = sampleId;
     }
 
     public String getWorkflowRunName() {
