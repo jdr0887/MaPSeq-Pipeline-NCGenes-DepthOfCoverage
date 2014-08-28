@@ -55,7 +55,7 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
         }
 
         if (sample == null) {
-            System.err.println("HTSFSample not found: ");
+            System.err.println("Sample not found: ");
             return null;
         }
 
@@ -80,11 +80,11 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             if (StringUtils.isNotEmpty(intervalList)) {
-                String format = "{\"entities\":[{\"entity_type\":\"Sample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
+                String format = "{\"entities\":[{\"entityType\":\"Sample\",\"id\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entityType\":\"WorkflowRun\",\"name\":\"%s\"}]}";
                 producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
                         sampleId, prefix, summaryCoverageThreshold, intervalList, workflowRunName)));
             } else {
-                String format = "{\"entities\":[{\"entity_type\":\"Sample\",\"guid\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"}]},{\"entity_type\":\"WorkflowRun\",\"name\":\"%s\"}]}";
+                String format = "{\"entities\":[{\"entityType\":\"Sample\",\"id\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"}]},{\"entityType\":\"WorkflowRun\",\"name\":\"%s\"}]}";
                 producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
                         sampleId, prefix, summaryCoverageThreshold, workflowRunName)));
             }
