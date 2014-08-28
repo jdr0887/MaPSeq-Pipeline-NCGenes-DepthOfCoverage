@@ -34,7 +34,6 @@ import edu.unc.mapseq.dao.MaPSeqDAOException;
 import edu.unc.mapseq.dao.SampleDAO;
 import edu.unc.mapseq.dao.model.Attribute;
 import edu.unc.mapseq.dao.model.FileData;
-import edu.unc.mapseq.dao.model.Flowcell;
 import edu.unc.mapseq.dao.model.MimeType;
 import edu.unc.mapseq.dao.model.Sample;
 import edu.unc.mapseq.dao.model.Workflow;
@@ -103,7 +102,9 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 continue;
             }
 
-            File outputDirectory = new File(sample.getOutputDirectory());
+            File outputDirectory = new File(sample.getOutputDirectory(), getName().replace("DOC", ""));
+            File tmpDirectory = new File(outputDirectory, "tmp");
+            tmpDirectory.mkdirs();
 
             Set<Attribute> attributeSet = workflowRun.getAttributes();
             if (attributeSet != null && !attributeSet.isEmpty()) {
@@ -216,8 +217,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 continue;
             }
 
-            Flowcell flowcell = sample.getFlowcell();
-            File outputDirectory = new File(sample.getOutputDirectory());
+            File outputDirectory = new File(sample.getOutputDirectory(), getName().replace("DOC", ""));
 
             String prefix = null;
             Set<Attribute> attributeSet = workflowRun.getAttributes();
