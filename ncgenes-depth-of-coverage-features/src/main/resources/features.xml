@@ -1,4 +1,4 @@
-<features name="mapseq-pipeline-ncgenes-depth-of-coverage-${project.version}">
+<features name="mapseq-pipeline-ncgenes-depth-of-coverage-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
 
   <feature name="mapseq-pipeline-ncgenes-depth-of-coverage" version="${project.version}" resolver="(obr)">
     <bundle>mvn:edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage/ncgenes-depth-of-coverage-workflow/${project.version}</bundle>
