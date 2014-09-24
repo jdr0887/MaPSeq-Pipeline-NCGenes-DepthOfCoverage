@@ -159,9 +159,8 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             try {
 
                 // new job
-                CondorJobBuilder builder = WorkflowJobFactory
-                        .createJob(++count, GATKDepthOfCoverageCLI.class, attempt, sample).siteName(siteName)
-                        .initialDirectory(outputDirectory.getAbsolutePath());
+                CondorJobBuilder builder = WorkflowJobFactory.createJob(++count, GATKDepthOfCoverageCLI.class, attempt)
+                        .siteName(siteName).initialDirectory(outputDirectory.getAbsolutePath());
                 builder.addArgument(GATKDepthOfCoverageCLI.PHONEHOME, GATKPhoneHomeType.NO_ET.toString())
                         .addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE, GATKDownsamplingType.NONE.toString())
                         .addArgument(GATKDepthOfCoverageCLI.INTERVALMERGING, "OVERLAPPING_ONLY")
