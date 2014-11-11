@@ -402,4 +402,9 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
     }
 
+    @Override
+    public void cleanUp() throws WorkflowException {
+        //do nothing
+    }
+
 }
