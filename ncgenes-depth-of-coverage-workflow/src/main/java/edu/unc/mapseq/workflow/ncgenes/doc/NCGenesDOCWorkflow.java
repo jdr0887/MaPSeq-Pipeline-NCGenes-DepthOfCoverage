@@ -44,9 +44,9 @@ import edu.unc.mapseq.module.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.gatk.GATKTableRecalibration;
 import edu.unc.mapseq.workflow.WorkflowException;
-import edu.unc.mapseq.workflow.WorkflowUtil;
 import edu.unc.mapseq.workflow.impl.AbstractSampleWorkflow;
 import edu.unc.mapseq.workflow.impl.WorkflowJobFactory;
+import edu.unc.mapseq.workflow.impl.WorkflowUtil;
 
 public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
@@ -140,16 +140,9 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             logger.debug("laneIndex = {}", laneIndex);
             Set<FileData> fileDataSet = sample.getFileDatas();
 
-            File bamFile = null;
-
-            List<File> potentialBAMFileList = WorkflowUtil.lookupFileByJobAndMimeTypeAndWorkflowId(fileDataSet,
-                    getWorkflowBeanService().getMaPSeqDAOBean(), GATKTableRecalibration.class,
-                    MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
-
-            // assume that only one GATKTableRecalibration job exists
-            if (potentialBAMFileList.size() > 0) {
-                bamFile = potentialBAMFileList.get(0);
-            }
+            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService()
+                    .getMaPSeqDAOBean(), fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM,
+                    ncgenesWorkflow.getId());
 
             if (bamFile == null) {
                 logger.error("bam file to process was not found");
@@ -372,16 +365,9 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 e.printStackTrace();
             }
 
-            File bamFile = null;
-
-            List<File> potentialBAMFileList = WorkflowUtil.lookupFileByJobAndMimeTypeAndWorkflowId(fileDataSet,
-                    getWorkflowBeanService().getMaPSeqDAOBean(), GATKTableRecalibration.class,
-                    MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
-
-            // assume that only one GATKTableRecalibration job exists
-            if (potentialBAMFileList.size() > 0) {
-                bamFile = potentialBAMFileList.get(0);
-            }
+            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService()
+                    .getMaPSeqDAOBean(), fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM,
+                    ncgenesWorkflow.getId());
 
             if (bamFile == null) {
                 logger.error("bam file to process was not found");
