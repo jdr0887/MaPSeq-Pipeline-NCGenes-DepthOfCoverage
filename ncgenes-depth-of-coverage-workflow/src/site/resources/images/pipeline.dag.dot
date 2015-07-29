@@ -1,3 +1,0 @@
-digraph G {
-  GATKDepthOfCoverageCLI_1 [ label="GATKDepthOfCoverageCLI_1" ];
-}
