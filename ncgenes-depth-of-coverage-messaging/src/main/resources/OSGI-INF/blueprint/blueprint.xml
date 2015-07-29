@@ -9,6 +9,7 @@
 
   <bean id="NCGenesDOCMessageListener" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessageListener">
     <property name="workflowBeanService" ref="NCGenesDOCWorkflowBeanService" />
+    <property name="workflowName" value="NCGenesDOC" />
   </bean>
 
   <bean id="NCGenesDOCMessageService" class="edu.unc.mapseq.messaging.ncgenes.doc.NCGenesDOCMessageService"

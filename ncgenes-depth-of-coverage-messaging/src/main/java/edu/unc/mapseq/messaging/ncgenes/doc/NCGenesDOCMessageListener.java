@@ -78,9 +78,9 @@ public class NCGenesDOCMessageListener extends AbstractMessageListener {
 
         Workflow workflow = null;
         try {
-            List<Workflow> workflowList = workflowDAO.findByName("NCGenesDOC");
+            List<Workflow> workflowList = workflowDAO.findByName(getWorkflowName());
             if (workflowList == null || (workflowList != null && workflowList.isEmpty())) {
-                logger.error("No Workflow Found: {}", "NCGenesDOC");
+                logger.error("No Workflow Found: {}", getWorkflowName());
                 return;
             }
             workflow = workflowList.get(0);
