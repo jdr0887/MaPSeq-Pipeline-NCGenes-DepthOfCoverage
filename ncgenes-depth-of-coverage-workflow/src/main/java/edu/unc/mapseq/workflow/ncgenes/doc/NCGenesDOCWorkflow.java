@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,18 +40,18 @@ import edu.unc.mapseq.dao.model.Sample;
 import edu.unc.mapseq.dao.model.Workflow;
 import edu.unc.mapseq.dao.model.WorkflowRun;
 import edu.unc.mapseq.dao.model.WorkflowRunAttempt;
-import edu.unc.mapseq.module.gatk.GATKDepthOfCoverageCLI;
-import edu.unc.mapseq.module.gatk.GATKDownsamplingType;
-import edu.unc.mapseq.module.gatk.GATKPhoneHomeType;
-import edu.unc.mapseq.module.gatk.GATKTableRecalibration;
+import edu.unc.mapseq.module.sequencing.gatk.GATKDepthOfCoverageCLI;
+import edu.unc.mapseq.module.sequencing.gatk.GATKDownsamplingType;
+import edu.unc.mapseq.module.sequencing.gatk.GATKPhoneHomeType;
+import edu.unc.mapseq.module.sequencing.gatk.GATKTableRecalibration;
 import edu.unc.mapseq.workflow.WorkflowException;
 import edu.unc.mapseq.workflow.impl.AbstractSampleWorkflow;
+import edu.unc.mapseq.workflow.impl.SampleWorkflowUtil;
 import edu.unc.mapseq.workflow.impl.WorkflowJobFactory;
-import edu.unc.mapseq.workflow.impl.WorkflowUtil;
 
 public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
-    private final Logger logger = LoggerFactory.getLogger(NCGenesDOCWorkflow.class);
+    private static final Logger logger = LoggerFactory.getLogger(NCGenesDOCWorkflow.class);
 
     public NCGenesDOCWorkflow() {
         super();
@@ -72,8 +73,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
     public Graph<CondorJob, CondorJobEdge> createGraph() throws WorkflowException {
         logger.debug("ENTERING createGraph()");
 
-        DirectedGraph<CondorJob, CondorJobEdge> graph = new DefaultDirectedGraph<CondorJob, CondorJobEdge>(
-                CondorJobEdge.class);
+        DirectedGraph<CondorJob, CondorJobEdge> graph = new DefaultDirectedGraph<CondorJob, CondorJobEdge>(CondorJobEdge.class);
 
         int count = 0;
         String intervalList = null;
@@ -85,7 +85,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
         Workflow ncgenesWorkflow = null;
         try {
-            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes").get(0);
+            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBeanService().getWorkflowDAO().findByName("NCGenesBaseline").get(0);
         } catch (MaPSeqDAOException e1) {
             e1.printStackTrace();
         }
@@ -102,7 +102,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 continue;
             }
 
-            File outputDirectory = new File(sample.getOutputDirectory(), getName().replace("DOC", ""));
+            File outputDirectory = new File(sample.getOutputDirectory(), getName());
             File tmpDirectory = new File(outputDirectory, "tmp");
             tmpDirectory.mkdirs();
 
@@ -140,9 +140,8 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             logger.debug("laneIndex = {}", laneIndex);
             Set<FileData> fileDataSet = sample.getFileDatas();
 
-            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService()
-                    .getMaPSeqDAOBean(), fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM,
-                    ncgenesWorkflow.getId());
+            File bamFile = SampleWorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+                    fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
 
             if (bamFile == null) {
                 logger.error("bam file to process was not found");
@@ -153,8 +152,8 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
                 // new job
                 CondorJobBuilder builder = WorkflowJobFactory
-                        .createJob(++count, GATKDepthOfCoverageCLI.class, attempt.getId(), sample.getId())
-                        .siteName(siteName).initialDirectory(outputDirectory.getAbsolutePath());
+                        .createJob(++count, GATKDepthOfCoverageCLI.class, attempt.getId(), sample.getId()).siteName(siteName)
+                        .initialDirectory(outputDirectory.getAbsolutePath());
                 builder.addArgument(GATKDepthOfCoverageCLI.PHONEHOME, GATKPhoneHomeType.NO_ET.toString())
                         .addArgument(GATKDepthOfCoverageCLI.DOWNSAMPLINGTYPE, GATKDownsamplingType.NONE.toString())
                         .addArgument(GATKDepthOfCoverageCLI.INTERVALMERGING, "OVERLAPPING_ONLY")
@@ -188,16 +187,13 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
     public void postRun() throws WorkflowException {
         logger.info("ENTERING postRun()");
 
-        File mapseqrc = new File(System.getProperty("user.home"), ".mapseqrc");
-        Executor executor = BashExecutor.getInstance();
-
-        SampleDAO sampleDAO = getWorkflowBeanService().getMaPSeqDAOBean().getSampleDAO();
+        SampleDAO sampleDAO = getWorkflowBeanService().getMaPSeqDAOBeanService().getSampleDAO();
 
         Set<Sample> sampleSet = getAggregatedSamples();
 
         Workflow ncgenesWorkflow = null;
         try {
-            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBean().getWorkflowDAO().findByName("NCGenes").get(0);
+            ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBeanService().getWorkflowDAO().findByName("NCGenesBaseline").get(0);
         } catch (MaPSeqDAOException e1) {
             e1.printStackTrace();
         }
@@ -210,12 +206,12 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 continue;
             }
 
-            File outputDirectory = new File(sample.getOutputDirectory(), getName().replace("DOC", ""));
+            File outputDirectory = new File(sample.getOutputDirectory(), getName());
 
             String prefix = null;
-            Set<Attribute> attributeSet = workflowRun.getAttributes();
-            if (attributeSet != null && !attributeSet.isEmpty()) {
-                Iterator<Attribute> attributeIter = attributeSet.iterator();
+            Set<Attribute> workflowRunAttributeSet = workflowRun.getAttributes();
+            if (CollectionUtils.isNotEmpty(workflowRunAttributeSet)) {
+                Iterator<Attribute> attributeIter = workflowRunAttributeSet.iterator();
                 while (attributeIter.hasNext()) {
                     Attribute attribute = attributeIter.next();
                     if ("GATKDepthOfCoverage.prefix".equals(attribute.getName())) {
@@ -232,21 +228,23 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             logger.info("GATKDepthOfCoverage.prefix = {}", prefix);
 
             Set<FileData> fileDataSet = sample.getFileDatas();
+            Set<Attribute> sampleAttributeSet = sample.getAttributes();
 
-            Set<String> attributeNameSet = new HashSet<String>();
+            Set<String> sampleAttributeNameSet = new HashSet<String>();
 
-            for (Attribute attribute : attributeSet) {
-                attributeNameSet.add(attribute.getName());
+            if (CollectionUtils.isNotEmpty(sampleAttributeSet)) {
+                for (Attribute attribute : sampleAttributeSet) {
+                    sampleAttributeNameSet.add(attribute.getName());
+                }
             }
 
-            Set<String> synchSet = Collections.synchronizedSet(attributeNameSet);
+            Set<String> synchSet = Collections.synchronizedSet(sampleAttributeNameSet);
 
-            Collection<File> potentialFileList = FileUtils.listFiles(
-                    outputDirectory,
-                    FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
-                            FileFilterUtils.suffixFileFilter(".sample_summary")), null);
+            Collection<File> potentialFileList = FileUtils.listFiles(outputDirectory,
+                    FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix), FileFilterUtils.suffixFileFilter(".sample_summary")),
+                    null);
 
-            if (potentialFileList != null && potentialFileList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(potentialFileList)) {
                 File docFile = potentialFileList.iterator().next();
                 try {
                     List<String> lines = FileUtils.readLines(docFile);
@@ -259,26 +257,26 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
                                 String totalCoverageKey = String.format("GATKDepthOfCoverage.%s.totalCoverage", prefix);
                                 if (synchSet.contains(totalCoverageKey)) {
-                                    for (Attribute attribute : attributeSet) {
+                                    for (Attribute attribute : sampleAttributeSet) {
                                         if (attribute.getName().equals(totalCoverageKey)) {
                                             attribute.setValue(split[1]);
                                             break;
                                         }
                                     }
                                 } else {
-                                    attributeSet.add(new Attribute(totalCoverageKey, split[1]));
+                                    sampleAttributeSet.add(new Attribute(totalCoverageKey, split[1]));
                                 }
 
                                 String meanCoverageKey = String.format("GATKDepthOfCoverage.%s.mean", prefix);
                                 if (synchSet.contains(meanCoverageKey)) {
-                                    for (Attribute attribute : attributeSet) {
+                                    for (Attribute attribute : sampleAttributeSet) {
                                         if (attribute.getName().equals(meanCoverageKey)) {
                                             attribute.setValue(split[1]);
                                             break;
                                         }
                                     }
                                 } else {
-                                    attributeSet.add(new Attribute(meanCoverageKey, split[2]));
+                                    sampleAttributeSet.add(new Attribute(meanCoverageKey, split[2]));
                                 }
                             }
                         }
@@ -290,10 +288,12 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             }
 
             Long totalPassedReads = null;
-            for (Attribute attribute : attributeSet) {
-                if ("SAMToolsFlagstat.totalPassedReads".equals(attribute.getName())) {
-                    totalPassedReads = Long.valueOf(attribute.getValue());
-                    break;
+            if (CollectionUtils.isNotEmpty(sampleAttributeSet)) {
+                for (Attribute attribute : sampleAttributeSet) {
+                    if ("SAMToolsFlagstat.totalPassedReads".equals(attribute.getName())) {
+                        totalPassedReads = Long.valueOf(attribute.getValue());
+                        break;
+                    }
                 }
             }
 
@@ -301,12 +301,10 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 logger.warn("SAMToolsFlagstat.totalPassedReads is null");
             }
 
-            potentialFileList = FileUtils.listFiles(
-                    outputDirectory,
-                    FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
-                            FileFilterUtils.suffixFileFilter(".sample_interval_summary")), null);
+            potentialFileList = FileUtils.listFiles(outputDirectory, FileFilterUtils.and(FileFilterUtils.prefixFileFilter(prefix),
+                    FileFilterUtils.suffixFileFilter(".sample_interval_summary")), null);
 
-            if (potentialFileList != null && potentialFileList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(potentialFileList)) {
                 try {
                     File docFile = potentialFileList.iterator().next();
                     BufferedReader br = new BufferedReader(new FileReader(docFile));
@@ -320,33 +318,33 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
                     logger.info("totalCoverageCount = {}", totalCoverageCount);
 
-                    String totalCoverageCountKey = String.format(
-                            "GATKDepthOfCoverage.%s.sample_interval_summary.totalCoverageCount", prefix);
+                    String totalCoverageCountKey = String.format("GATKDepthOfCoverage.%s.sample_interval_summary.totalCoverageCount",
+                            prefix);
 
                     if (synchSet.contains(totalCoverageCountKey)) {
-                        for (Attribute attribute : attributeSet) {
+                        for (Attribute attribute : sampleAttributeSet) {
                             if (attribute.getName().equals(totalCoverageCountKey)) {
                                 attribute.setValue(totalCoverageCount + "");
                                 break;
                             }
                         }
                     } else {
-                        attributeSet.add(new Attribute(totalCoverageCountKey, totalCoverageCount + ""));
+                        sampleAttributeSet.add(new Attribute(totalCoverageCountKey, totalCoverageCount + ""));
                     }
 
                     String numberOnTargetKey = String.format("%s.numberOnTarget", prefix);
 
                     if (totalPassedReads != null) {
                         if (synchSet.contains(numberOnTargetKey)) {
-                            for (Attribute attribute : attributeSet) {
+                            for (Attribute attribute : sampleAttributeSet) {
                                 if (attribute.getName().equals(numberOnTargetKey) && totalPassedReads != null) {
                                     attribute.setValue((double) totalCoverageCount / (totalPassedReads * 100) + "");
                                     break;
                                 }
                             }
                         } else {
-                            attributeSet.add(new Attribute(numberOnTargetKey, (double) totalCoverageCount
-                                    / (totalPassedReads * 100) + ""));
+                            sampleAttributeSet
+                                    .add(new Attribute(numberOnTargetKey, (double) totalCoverageCount / (totalPassedReads * 100) + ""));
                         }
                     }
                 } catch (NumberFormatException e) {
@@ -359,15 +357,14 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             }
 
             try {
-                sample.setAttributes(attributeSet);
+                sample.setAttributes(sampleAttributeSet);
                 sampleDAO.save(sample);
             } catch (MaPSeqDAOException e) {
                 e.printStackTrace();
             }
 
-            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService()
-                    .getMaPSeqDAOBean(), fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM,
-                    ncgenesWorkflow.getId());
+            File bamFile = SampleWorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+                    fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
 
             if (bamFile == null) {
                 logger.error("bam file to process was not found");
@@ -376,8 +373,9 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
 
             try {
                 CommandInput commandInput = new CommandInput();
-                commandInput.setCommand(String.format("/bin/cp %s/%s.* /tmp/", outputDirectory.getAbsolutePath(),
-                        prefix));
+                commandInput.setCommand(String.format("/bin/cp %s/%s.* /tmp/", outputDirectory.getAbsolutePath(), prefix));
+                File mapseqrc = new File(System.getProperty("user.home"), ".mapseqrc");
+                Executor executor = BashExecutor.getInstance();
                 CommandOutput commandOutput = executor.execute(commandInput, mapseqrc);
                 logger.info("commandOutput.getExitCode(): {}", commandOutput.getExitCode());
             } catch (ExecutorException e) {

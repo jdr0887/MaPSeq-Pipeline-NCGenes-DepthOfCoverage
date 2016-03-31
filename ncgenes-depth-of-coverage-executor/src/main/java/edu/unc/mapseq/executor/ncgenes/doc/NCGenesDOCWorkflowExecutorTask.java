@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import edu.unc.mapseq.workflow.ncgenes.doc.NCGenesDOCWorkflow;
 
 public class NCGenesDOCWorkflowExecutorTask extends TimerTask {
 
-    private final Logger logger = LoggerFactory.getLogger(NCGenesDOCWorkflowExecutorTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(NCGenesDOCWorkflowExecutorTask.class);
 
     private final WorkflowTPE threadPoolExecutor = new WorkflowTPE();
 
@@ -36,23 +37,21 @@ public class NCGenesDOCWorkflowExecutorTask extends TimerTask {
         threadPoolExecutor.setCorePoolSize(workflowBeanService.getCorePoolSize());
         threadPoolExecutor.setMaximumPoolSize(workflowBeanService.getMaxPoolSize());
 
-        logger.info(String.format("ActiveCount: %d, TaskCount: %d, CompletedTaskCount: %d",
-                threadPoolExecutor.getActiveCount(), threadPoolExecutor.getTaskCount(),
-                threadPoolExecutor.getCompletedTaskCount()));
+        logger.info(String.format("ActiveCount: %d, TaskCount: %d, CompletedTaskCount: %d", threadPoolExecutor.getActiveCount(),
+                threadPoolExecutor.getTaskCount(), threadPoolExecutor.getCompletedTaskCount()));
 
-        WorkflowDAO workflowDAO = this.workflowBeanService.getMaPSeqDAOBean().getWorkflowDAO();
-        WorkflowRunAttemptDAO workflowRunAttemptDAO = this.workflowBeanService.getMaPSeqDAOBean()
-                .getWorkflowRunAttemptDAO();
+        WorkflowDAO workflowDAO = this.workflowBeanService.getMaPSeqDAOBeanService().getWorkflowDAO();
+        WorkflowRunAttemptDAO workflowRunAttemptDAO = this.workflowBeanService.getMaPSeqDAOBeanService().getWorkflowRunAttemptDAO();
 
         try {
             List<Workflow> workflowList = workflowDAO.findByName("NCGenesDOC");
-            if (workflowList == null || (workflowList != null && workflowList.isEmpty())) {
+            if (CollectionUtils.isEmpty(workflowList)) {
                 logger.error("No Workflow Found: {}", "NCGenesDOC");
                 return;
             }
             Workflow workflow = workflowList.get(0);
             List<WorkflowRunAttempt> attempts = workflowRunAttemptDAO.findEnqueued(workflow.getId());
-            if (attempts != null && !attempts.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(attempts)) {
                 logger.info("dequeuing {} WorkflowRunAttempt", attempts.size());
                 for (WorkflowRunAttempt attempt : attempts) {
 

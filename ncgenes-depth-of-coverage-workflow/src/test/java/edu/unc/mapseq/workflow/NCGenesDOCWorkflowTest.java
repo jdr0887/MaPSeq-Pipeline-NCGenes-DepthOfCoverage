@@ -13,21 +13,20 @@ import org.renci.jlrm.condor.CondorJobBuilder;
 import org.renci.jlrm.condor.CondorJobEdge;
 import org.renci.jlrm.condor.ext.CondorDOTExporter;
 
-import edu.unc.mapseq.module.gatk.GATKDepthOfCoverageCLI;
+import edu.unc.mapseq.module.sequencing.gatk.GATKDepthOfCoverageCLI;
 
 public class NCGenesDOCWorkflowTest {
 
     @Test
     public void createDot() {
 
-        DirectedGraph<CondorJob, CondorJobEdge> graph = new DefaultDirectedGraph<CondorJob, CondorJobEdge>(
-                CondorJobEdge.class);
+        DirectedGraph<CondorJob, CondorJobEdge> graph = new DefaultDirectedGraph<CondorJob, CondorJobEdge>(CondorJobEdge.class);
 
         int count = 0;
 
         // new job
-        CondorJob gatkDepthOfCoverageJob = new CondorJobBuilder().name(
-                String.format("%s_%d", GATKDepthOfCoverageCLI.class.getSimpleName(), ++count)).build();
+        CondorJob gatkDepthOfCoverageJob = new CondorJobBuilder()
+                .name(String.format("%s_%d", GATKDepthOfCoverageCLI.class.getSimpleName(), ++count)).build();
         graph.addVertex(gatkDepthOfCoverageJob);
 
         VertexNameProvider<CondorJob> vnpId = new VertexNameProvider<CondorJob>() {
@@ -44,8 +43,8 @@ public class NCGenesDOCWorkflowTest {
             }
         };
 
-        CondorDOTExporter<CondorJob, CondorJobEdge> dotExporter = new CondorDOTExporter<CondorJob, CondorJobEdge>(
-                vnpId, vnpLabel, null, null, null, null);
+        CondorDOTExporter<CondorJob, CondorJobEdge> dotExporter = new CondorDOTExporter<CondorJob, CondorJobEdge>(vnpId, vnpLabel, null,
+                null, null, null);
         File srcSiteResourcesImagesDir = new File("../src/site/resources/images");
         if (!srcSiteResourcesImagesDir.exists()) {
             srcSiteResourcesImagesDir.mkdirs();

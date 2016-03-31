@@ -11,16 +11,17 @@ import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.karaf.shell.commands.Argument;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.AbstractAction;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Argument;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 
 import edu.unc.mapseq.config.MaPSeqConfigurationService;
-import edu.unc.mapseq.dao.MaPSeqDAOBean;
+import edu.unc.mapseq.dao.MaPSeqDAOBeanService;
 import edu.unc.mapseq.dao.model.Sample;
 
 @Command(scope = "ncgenes-doc", name = "run-workflow", description = "Run NCGenes DepthOfCoverage Workflow")
-public class RunNCGenesDOCWorkflowAction extends AbstractAction {
+public class RunNCGenesDOCWorkflowAction implements Action {
 
     @Argument(index = 0, name = "sampleId", description = "Sample Identifier", required = true, multiValued = false)
     private Long sampleId;
@@ -37,8 +38,10 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
     @Argument(index = 4, name = "intervalList", description = "Interval List file", required = false, multiValued = false)
     private String intervalList;
 
-    private MaPSeqDAOBean maPSeqDAOBean;
+    @Reference
+    private MaPSeqDAOBeanService maPSeqDAOBeanService;
 
+    @Reference
     private MaPSeqConfigurationService maPSeqConfigurationService;
 
     public RunNCGenesDOCWorkflowAction() {
@@ -46,11 +49,11 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
     }
 
     @Override
-    public Object doExecute() {
+    public Object execute() {
 
         Sample sample = null;
         try {
-            sample = maPSeqDAOBean.getSampleDAO().findById(sampleId);
+            sample = maPSeqDAOBeanService.getSampleDAO().findById(sampleId);
         } catch (Exception e1) {
         }
 
@@ -62,14 +65,13 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
         if (StringUtils.isNotEmpty(intervalList)) {
             File intervalListFile = new File(intervalList);
             if (!intervalListFile.exists()) {
-                System.out.printf("Interval List file does not exist...check path: %s",
-                        intervalListFile.getAbsolutePath());
+                System.out.printf("Interval List file does not exist...check path: %s", intervalListFile.getAbsolutePath());
                 return null;
             }
         }
 
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(String.format("nio://%s:61616",
-                maPSeqConfigurationService.getWebServiceHost("localhost")));
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+                String.format("nio://%s:61616", maPSeqConfigurationService.getWebServiceHost("localhost")));
 
         Connection connection = null;
         Session session = null;
@@ -81,12 +83,12 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             if (StringUtils.isNotEmpty(intervalList)) {
                 String format = "{\"entities\":[{\"entityType\":\"Sample\",\"id\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.intervalList\",\"value\":\"%s\"}]},{\"entityType\":\"WorkflowRun\",\"name\":\"%s\"}]}";
-                producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
-                        sampleId, prefix, summaryCoverageThreshold, intervalList, workflowRunName)));
+                producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"), sampleId, prefix,
+                        summaryCoverageThreshold, intervalList, workflowRunName)));
             } else {
                 String format = "{\"entities\":[{\"entityType\":\"Sample\",\"id\":\"%d\",\"attributes\":[{\"name\":\"GATKDepthOfCoverage.prefix\",\"value\":\"%s\"},{\"name\":\"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\":\"%s\"}]},{\"entityType\":\"WorkflowRun\",\"name\":\"%s\"}]}";
-                producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"),
-                        sampleId, prefix, summaryCoverageThreshold, workflowRunName)));
+                producer.send(session.createTextMessage(String.format(format, System.getProperty("user.name"), sampleId, prefix,
+                        summaryCoverageThreshold, workflowRunName)));
             }
         } catch (JMSException e) {
             e.printStackTrace();
@@ -140,22 +142,6 @@ public class RunNCGenesDOCWorkflowAction extends AbstractAction {
 
     public void setIntervalList(String intervalList) {
         this.intervalList = intervalList;
-    }
-
-    public MaPSeqDAOBean getMaPSeqDAOBean() {
-        return maPSeqDAOBean;
-    }
-
-    public void setMaPSeqDAOBean(MaPSeqDAOBean maPSeqDAOBean) {
-        this.maPSeqDAOBean = maPSeqDAOBean;
-    }
-
-    public MaPSeqConfigurationService getMaPSeqConfigurationService() {
-        return maPSeqConfigurationService;
-    }
-
-    public void setMaPSeqConfigurationService(MaPSeqConfigurationService maPSeqConfigurationService) {
-        this.maPSeqConfigurationService = maPSeqConfigurationService;
     }
 
 }
