@@ -45,11 +45,11 @@ import edu.unc.mapseq.module.sequencing.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKTableRecalibration;
 import edu.unc.mapseq.workflow.WorkflowException;
-import edu.unc.mapseq.workflow.impl.AbstractSampleWorkflow;
-import edu.unc.mapseq.workflow.impl.SampleWorkflowUtil;
-import edu.unc.mapseq.workflow.impl.WorkflowJobFactory;
+import edu.unc.mapseq.workflow.core.WorkflowUtil;
+import edu.unc.mapseq.workflow.sequencing.AbstractSequencingWorkflow;
+import edu.unc.mapseq.workflow.sequencing.SequencingWorkflowJobFactory;
 
-public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
+public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
 
     private static final Logger logger = LoggerFactory.getLogger(NCGenesDOCWorkflow.class);
 
@@ -140,7 +140,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             logger.debug("laneIndex = {}", laneIndex);
             Set<FileData> fileDataSet = sample.getFileDatas();
 
-            File bamFile = SampleWorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
                     fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
 
             if (bamFile == null) {
@@ -151,7 +151,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
             try {
 
                 // new job
-                CondorJobBuilder builder = WorkflowJobFactory
+                CondorJobBuilder builder = SequencingWorkflowJobFactory
                         .createJob(++count, GATKDepthOfCoverageCLI.class, attempt.getId(), sample.getId()).siteName(siteName)
                         .initialDirectory(outputDirectory.getAbsolutePath());
                 builder.addArgument(GATKDepthOfCoverageCLI.PHONEHOME, GATKPhoneHomeType.NO_ET.toString())
@@ -363,7 +363,7 @@ public class NCGenesDOCWorkflow extends AbstractSampleWorkflow {
                 e.printStackTrace();
             }
 
-            File bamFile = SampleWorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+            File bamFile = WorkflowUtil.findFileByJobAndMimeTypeAndWorkflowId(getWorkflowBeanService().getMaPSeqDAOBeanService(),
                     fileDataSet, GATKTableRecalibration.class, MimeType.APPLICATION_BAM, ncgenesWorkflow.getId());
 
             if (bamFile == null) {
