@@ -14,8 +14,7 @@ public class NCGenesDOCMessageTest {
 
     @Test
     public void testQueue() {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(String.format("nio://%s:61616",
-                "biodev2.its.unc.edu"));
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(String.format("nio://%s:61616", "biodev2.its.unc.edu"));
 
         Connection connection = null;
         Session session = null;
@@ -26,9 +25,9 @@ public class NCGenesDOCMessageTest {
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             String format = "{\"entities\": [{\"attributes\": [{\"name\": \"GATKDepthOfCoverage.intervalList\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.prefix\",\"value\": \"%s\"},{\"name\": \"GATKDepthOfCoverage.summaryCoverageThreshold\",\"value\": \"%s\"}],\"entityType\": \"Sample\",\"id\": \"%d\"},{\"entityType\": \"WorkflowRun\",\"name\": \"%s\"}]}";
-            producer.send(session.createTextMessage(String.format(format,
-                    "/proj/renci/sequence_analysis/annotation/abeast/NCGenes/13/exons_pm_0_v13.interval_list",
-                    "NCG_00009.52422", "1,2,5,8,10,15,20,30,50", 52422L, "UNIQUEJOBNAME")));
+            producer.send(session.createTextMessage(
+                    String.format(format, "/proj/renci/sequence_analysis/annotation/abeast/NCGenes/13/exons_pm_0_v13.interval_list",
+                            "NCG_00009.52422", "1,2,5,8,10,15,20,30,50", 52422L, "UNIQUEJOBNAME")));
 
             // NCG_00009.52422.DOC.ebb2f3fe-a11b-11e2-9390-001ec9393b7a
         } catch (JMSException e) {
