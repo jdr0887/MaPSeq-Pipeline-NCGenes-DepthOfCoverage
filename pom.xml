@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.unc.mapseq.pipelines</groupId>
   <artifactId>ncgenes-depth-of-coverage</artifactId>
-  <version>0.6.5-SNAPSHOT</version>
+  <version>0.6.5</version>
   <packaging>pom</packaging>
   <url>https://jdr0887.github.io/MaPSeq-Pipeline-NCGenes-DepthOfCoverage</url>
   <organization>
@@ -31,14 +31,14 @@
     <url>https://github.com/jdr0887/MaPSeq-Pipeline-NCGenes-DepthOfCoverage</url>
     <developerConnection>scm:git:git@github.com:jdr0887/MaPSeq-Pipeline-NCGenes-DepthOfCoverage.git</developerConnection>
     <connection>scm:git:git@github.com:jdr0887/MaPSeq-Pipeline-NCGenes-DepthOfCoverage.git</connection>
-    <tag>HEAD</tag>
+    <tag>ncgenes-depth-of-coverage-0.6.5</tag>
   </scm>
   <dependencyManagement>
     <dependencies>
       <dependency>
       	<groupId>edu.unc.mapseq.pipelines.ncgenes-depth-of-coverage</groupId>
       	<artifactId>ncgenes-depth-of-coverage-workflow</artifactId>
-      	<version>0.6.5-SNAPSHOT</version>
+      	<version>0.6.5</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
