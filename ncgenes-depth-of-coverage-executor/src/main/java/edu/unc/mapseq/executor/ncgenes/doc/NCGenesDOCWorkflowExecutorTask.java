@@ -26,6 +26,8 @@ public class NCGenesDOCWorkflowExecutorTask extends TimerTask {
 
     private WorkflowBeanService workflowBeanService;
 
+    private String workflowName;
+
     public NCGenesDOCWorkflowExecutorTask() {
         super();
     }
@@ -44,12 +46,19 @@ public class NCGenesDOCWorkflowExecutorTask extends TimerTask {
         WorkflowRunAttemptDAO workflowRunAttemptDAO = this.workflowBeanService.getMaPSeqDAOBeanService().getWorkflowRunAttemptDAO();
 
         try {
-            List<Workflow> workflowList = workflowDAO.findByName("NCGenesDOC");
+            Workflow workflow = null;
+            List<Workflow> workflowList = workflowDAO.findByName(getWorkflowName());
             if (CollectionUtils.isEmpty(workflowList)) {
-                logger.error("No Workflow Found: {}", "NCGenesDOC");
+                workflow = new Workflow(getWorkflowName());
+                workflow.setId(workflowDAO.save(workflow));
+            } else {
+                workflow = workflowList.get(0);
+            }
+
+            if (workflow == null) {
+                logger.error("Could not find or create {} workflow", getWorkflowName());
                 return;
             }
-            Workflow workflow = workflowList.get(0);
             List<WorkflowRunAttempt> attempts = workflowRunAttemptDAO.findEnqueued(workflow.getId());
             if (CollectionUtils.isNotEmpty(attempts)) {
                 logger.info("dequeuing {} WorkflowRunAttempt", attempts.size());
@@ -72,6 +81,14 @@ public class NCGenesDOCWorkflowExecutorTask extends TimerTask {
             e.printStackTrace();
         }
 
+    }
+
+    public String getWorkflowName() {
+        return workflowName;
+    }
+
+    public void setWorkflowName(String workflowName) {
+        this.workflowName = workflowName;
     }
 
     public WorkflowBeanService getWorkflowBeanService() {
