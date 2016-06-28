@@ -44,6 +44,7 @@ import edu.unc.mapseq.module.sequencing.gatk.GATKDepthOfCoverageCLI;
 import edu.unc.mapseq.module.sequencing.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKTableRecalibration;
+import edu.unc.mapseq.workflow.SystemType;
 import edu.unc.mapseq.workflow.WorkflowException;
 import edu.unc.mapseq.workflow.core.WorkflowUtil;
 import edu.unc.mapseq.workflow.sequencing.AbstractSequencingWorkflow;
@@ -63,10 +64,8 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
     }
 
     @Override
-    public String getVersion() {
-        ResourceBundle bundle = ResourceBundle.getBundle("edu/unc/mapseq/workflow/ncgenes/doc/workflow");
-        String version = bundle.getString("version");
-        return StringUtils.isNotEmpty(version) ? version : "0.0.1-SNAPSHOT";
+    public SystemType getSystem() {
+        return SystemType.PRODUCTION;
     }
 
     @Override
