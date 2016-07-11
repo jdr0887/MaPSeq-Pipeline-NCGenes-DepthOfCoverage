@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -44,11 +43,11 @@ import edu.unc.mapseq.module.sequencing.gatk.GATKDepthOfCoverageCLI;
 import edu.unc.mapseq.module.sequencing.gatk.GATKDownsamplingType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKPhoneHomeType;
 import edu.unc.mapseq.module.sequencing.gatk.GATKTableRecalibration;
-import edu.unc.mapseq.workflow.SystemType;
 import edu.unc.mapseq.workflow.WorkflowException;
 import edu.unc.mapseq.workflow.core.WorkflowUtil;
 import edu.unc.mapseq.workflow.sequencing.AbstractSequencingWorkflow;
 import edu.unc.mapseq.workflow.sequencing.SequencingWorkflowJobFactory;
+import edu.unc.mapseq.workflow.sequencing.SequencingWorkflowUtil;
 
 public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
 
@@ -56,16 +55,6 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
 
     public NCGenesDOCWorkflow() {
         super();
-    }
-
-    @Override
-    public String getName() {
-        return NCGenesDOCWorkflow.class.getSimpleName().replace("Workflow", "");
-    }
-
-    @Override
-    public SystemType getSystem() {
-        return SystemType.PRODUCTION;
     }
 
     @Override
@@ -101,7 +90,8 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
                 continue;
             }
 
-            File outputDirectory = new File(sample.getOutputDirectory(), getName());
+            File outputDirectory = SequencingWorkflowUtil.createOutputDirectory(sample,
+                    getWorkflowRunAttempt().getWorkflowRun().getWorkflow());
             File tmpDirectory = new File(outputDirectory, "tmp");
             tmpDirectory.mkdirs();
 
@@ -205,7 +195,8 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
                 continue;
             }
 
-            File outputDirectory = new File(sample.getOutputDirectory(), getName());
+            File outputDirectory = SequencingWorkflowUtil.createOutputDirectory(sample,
+                    getWorkflowRunAttempt().getWorkflowRun().getWorkflow());
 
             String prefix = null;
             Set<Attribute> workflowRunAttributeSet = workflowRun.getAttributes();
