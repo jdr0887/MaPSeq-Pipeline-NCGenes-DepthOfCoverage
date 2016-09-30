@@ -68,7 +68,8 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
         String prefix = null;
         String summaryCoverageThreshold = "1,2,5,8,10,15,20,30,50";
 
-        Set<Sample> sampleSet = getAggregatedSamples();
+        Set<Sample> sampleSet = SequencingWorkflowUtil.getAggregatedSamples(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+                getWorkflowRunAttempt());
         logger.info("sampleSet.size(): {}", sampleSet.size());
 
         Workflow ncgenesWorkflow = null;
@@ -178,8 +179,6 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
 
         SampleDAO sampleDAO = getWorkflowBeanService().getMaPSeqDAOBeanService().getSampleDAO();
 
-        Set<Sample> sampleSet = getAggregatedSamples();
-
         Workflow ncgenesWorkflow = null;
         try {
             ncgenesWorkflow = getWorkflowBeanService().getMaPSeqDAOBeanService().getWorkflowDAO().findByName("NCGenesBaseline").get(0);
@@ -188,6 +187,14 @@ public class NCGenesDOCWorkflow extends AbstractSequencingWorkflow {
         }
 
         WorkflowRun workflowRun = getWorkflowRunAttempt().getWorkflowRun();
+
+        Set<Sample> sampleSet = SequencingWorkflowUtil.getAggregatedSamples(getWorkflowBeanService().getMaPSeqDAOBeanService(),
+                getWorkflowRunAttempt());
+
+        if (CollectionUtils.isEmpty(sampleSet)) {
+            logger.warn("No Samples found");
+            return;
+        }
 
         for (Sample sample : sampleSet) {
 
